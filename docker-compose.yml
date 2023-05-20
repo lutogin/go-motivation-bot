@@ -17,15 +17,16 @@ services:
     env_file:
       - ./app/motivation-bot/.env.loc
     depends_on:
-      - mongodb-db
+      - go-motivation-mongodb
 
-  mongodb-db:
+  go-motivation-mongodb:
     image: mongo:4-focal
     container_name: go-motivation-bot-mongo
     restart: "no"
     ports:
       - '27017:27017'
     environment:
+      MONGO_INITDB_DATABASE: go-motivation-bot-users
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: Password1
       MONGO_USERNAME: user

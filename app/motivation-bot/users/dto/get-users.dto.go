@@ -1,7 +1,9 @@
 package usersDto
 
 type GetUsersDto struct {
-	Name  string `json:"name" bson:"name,omitempty" validate:"omitempty"`
-	Email string `json:"email" bson:"email,omitempty" validate:"omitempty,email"`
-	Phone string `json:"phone" bson:"phone,omitempty"`
+	ChatId    int64  `json:"chatId" bson:"chatId" validate:"required"`
+	FirstName string `json:"firstName" bson:"firstName"`
+	LastName  string `json:"lastName" bson:"lastName"`
+	UserName  string `json:"userName" bson:"userName" validate:"required"`
+	Cron      string `json:"cron" bson:"cron"`
 }

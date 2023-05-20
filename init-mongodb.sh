@@ -3,7 +3,7 @@ set -e
 
 mongo <<EOF
 use $MONGO_INITDB_DATABASE
-requests = db.getSiblingDB('motivation-bot-users')
+requests = db.getSiblingDB('go-motivation-bot-users')
 requests.createUser({
   user:  '$MONGO_USERNAME',
   pwd: '$MONGO_PASSWORD',

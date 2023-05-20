@@ -1,40 +1,29 @@
-package mongodb
+package mongoClient
 
 import (
 	"context"
 	"fmt"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"go.uber.org/dig"
-	"log"
 	"motivation-bot/common/logging"
 	"motivation-bot/config"
 	"time"
 )
-
-type MongoConnectOpt struct {
-	Host      string
-	Port      string
-	User      string // optional field
-	Password  string // optional field
-	Database  string
-	UriScheme string
-}
 
 type MongoConnection struct {
 	DB *mongo.Database
 }
 
 func NewMongoConnection(config *config.Env, logger *logging.Logger) *MongoConnection {
-	// MongoDB connection string
-	suffix := "retryWrites=true&w=majority"
+	logger.Logger.Infoln("Registering mongo connection.")
 
+	suffix := "retryWrites=true&w=majority"
 	connectionString := fmt.Sprintf("%s://%s:%s@%s:%s/%s?%s",
 		config.MongoUriScheme,
 		config.MongoUser,
 		config.MongoPassword,
-		config.Host,
-		config.Port,
+		config.MongoHost,
+		config.MongoPort,
 		config.MongoDatabase,
 		suffix,
 	)
@@ -52,23 +41,18 @@ func NewMongoConnection(config *config.Env, logger *logging.Logger) *MongoConnec
 	}
 
 	// Check the connection
-	err = client.Ping(context.Background(), nil)
+	err = client.Ping(ctx, nil)
 
 	if err != nil {
 		logger.Fatal(err)
 	}
 
+	logger.Infoln("DB connection is established.")
+
 	// Get a handle to the respective database
-	database := client.Database("your-database-name")
+	database := client.Database(config.MongoDatabase)
 
 	return &MongoConnection{
 		DB: database,
-	}
-}
-
-func ProvideMongoConnection(container *dig.Container) {
-	err := container.Provide(NewMongoConnection)
-	if err != nil {
-		log.Fatal(err)
 	}
 }

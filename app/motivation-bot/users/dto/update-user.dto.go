@@ -1,9 +1,10 @@
 package usersDto
 
 type UpdateUserDto struct {
-	Id      string `json:"id" bson:"-" validate:"required,mongodb"`
-	Name    string `json:"name" bson:"name,omitempty"`
-	Email   string `json:"email" bson:"email,omitempty" validate:"omitempty,email"`
-	Phone   string `json:"phone" bson:"phone,omitempty" validate:"omitempty,e164"`
-	PwdHash string `json:"-" bson:"pwdHash,omitempty"`
+	Id        string `json:"id" bson:"-" validate:"required,mongodb"`
+	ChatId    int64  `json:"chatId" bson:"chatId" validate:"omitempty"`
+	FirstName string `json:"firstName" bson:"firstName,omitempty" validate:"omitempty"`
+	LastName  string `json:"lastName" bson:"lastName,omitempty" validate:"omitempty"`
+	UserName  string `json:"userName" bson:"userName" validate:"omitempty"`
+	Cron      string `json:"cron" bson:"cron" validate:"omitempty"`
 }

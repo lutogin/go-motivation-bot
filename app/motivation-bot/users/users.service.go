@@ -7,11 +7,11 @@ import (
 )
 
 type Service struct {
-	repo   Repository
+	repo   *Repo
 	logger *logging.Logger
 }
 
-func NewService(repository Repository, logger *logging.Logger) *Service {
+func NewService(repository *Repo, logger *logging.Logger) *Service {
 	logger.Logger.Infoln("Registering service.")
 	return &Service{repo: repository, logger: logger}
 }

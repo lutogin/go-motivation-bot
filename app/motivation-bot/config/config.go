@@ -18,7 +18,7 @@ type Env struct {
 	MongoUser      string `yaml:"mongoUser" env:"MONGO_USER"`
 	MongoPassword  string `yaml:"mongoPassword" env:"MONGO_PASSWORD"`
 	MongoDatabase  string `yaml:"mongoDatabase" env:"MONGO_DATABASE"`
-	MongoUriScheme string `yaml:"mongoUriScheme" env:"MONGO_URI_SCHEME" env-default:"mongodb"`
+	MongoUriScheme string `yaml:"mongoUriScheme" env:"MONGO_URI_SCHEME" env-default:"mongo-client"`
 }
 
 var (
