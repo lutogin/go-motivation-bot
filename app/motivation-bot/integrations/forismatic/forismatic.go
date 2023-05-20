@@ -3,7 +3,7 @@ package forismatic
 import (
 	"encoding/json"
 	"io"
-	"motivation-bot/common/logging"
+	"motivation-bot/logging"
 	"net/http"
 	"net/url"
 	"strconv"

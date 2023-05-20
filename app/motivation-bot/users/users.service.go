@@ -2,7 +2,7 @@ package users
 
 import (
 	"context"
-	"motivation-bot/common/logging"
+	"motivation-bot/logging"
 	userDto "motivation-bot/users/dto"
 )
 

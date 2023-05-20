@@ -1,7 +1,7 @@
 package config
 
 import (
-	"motivation-bot/common/logging"
+	"motivation-bot/logging"
 	"sync"
 
 	"github.com/ilyakaznacheev/cleanenv"

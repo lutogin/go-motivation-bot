@@ -7,8 +7,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
-	"motivation-bot/common/logging"
-	mongo_client "motivation-bot/pkg/mongoClient"
+	"motivation-bot/logging"
+	"motivation-bot/pkg/mongoClient"
 	userDto "motivation-bot/users/dto"
 )
 
@@ -25,7 +25,7 @@ type Repo struct {
 	logger     *logging.Logger
 }
 
-func NewRepository(mongoConn *mongo_client.MongoConnection, logger *logging.Logger) *Repo {
+func NewRepository(mongoConn *mongoClient.MongoConnection, logger *logging.Logger) *Repo {
 	logger.Logger.Infoln("Registering new users repository.")
 
 	return &Repo{

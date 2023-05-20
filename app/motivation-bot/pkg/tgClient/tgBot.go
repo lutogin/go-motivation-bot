@@ -3,9 +3,9 @@ package tgClient
 import (
 	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"motivation-bot/common/logging"
 	"motivation-bot/config"
 	"motivation-bot/integrations/forismatic"
+	"motivation-bot/logging"
 )
 
 type Client struct {

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"motivation-bot/common/logging"
 	"motivation-bot/config"
+	"motivation-bot/logging"
 	"time"
 )
 
