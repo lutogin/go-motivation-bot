@@ -2,12 +2,12 @@ package di
 
 import (
 	"go.uber.org/dig"
+	"motivation-bot/adapters/mongoClient"
+	"motivation-bot/adapters/tgClient"
 	"motivation-bot/common"
 	"motivation-bot/config"
 	"motivation-bot/integrations/forismatic"
 	"motivation-bot/logging"
-	"motivation-bot/pkg/mongoClient"
-	"motivation-bot/pkg/tgClient"
 	"motivation-bot/users"
 )
 

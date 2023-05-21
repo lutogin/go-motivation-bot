@@ -57,6 +57,26 @@ func (c *Client) HandleCommand(bot *tgbotapi.BotAPI, update *tgbotapi.Update) {
 
 }
 
+func (c *Client) HandleQuery(bot *tgbotapi.BotAPI, update *tgbotapi.Update) {
+	data := update.CallbackQuery.Data
+	switch data {
+	case "setLang:en":
+		msg := tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, "You chose EN")
+		_, err := bot.Send(msg)
+		if err != nil {
+			c.logger.Error(err)
+		}
+
+	case "setLang:ru":
+		msg := tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, "You chose RU")
+		_, err := bot.Send(msg)
+		if err != nil {
+			c.logger.Error(err)
+		}
+	}
+
+}
+
 func (c *Client) Run() {
 	bot, err := tgbotapi.NewBotAPI(c.cfg.TgApiKey)
 	if err != nil {
@@ -88,12 +108,7 @@ func (c *Client) Run() {
 			continue
 		} else if update.CallbackQuery != nil {
 			// this is where we handle the callback query
-			data := update.CallbackQuery.Data
-			msg := tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, "You clicked: "+data)
-			_, err = bot.Send(msg)
-			if err != nil {
-				c.logger.Error(err)
-			}
+			c.HandleQuery(bot, &update)
 			continue
 		}
 

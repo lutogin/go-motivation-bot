@@ -7,8 +7,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
+	"motivation-bot/adapters/mongoClient"
 	"motivation-bot/logging"
-	"motivation-bot/pkg/mongoClient"
 	userDto "motivation-bot/users/dto"
 )
 
