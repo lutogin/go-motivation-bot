@@ -19,6 +19,7 @@ type Env struct {
 	MongoPassword  string `yaml:"mongoPassword" env:"MONGO_PASSWORD"`
 	MongoDatabase  string `yaml:"mongoDatabase" env:"MONGO_DATABASE"`
 	MongoUriScheme string `yaml:"mongoUriScheme" env:"MONGO_URI_SCHEME" env-default:"mongo-client"`
+	CronInterval   int    `yaml:"cronInterval" env:"CRON_INTERVAL" env-default:"30"`
 }
 
 var (

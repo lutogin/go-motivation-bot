@@ -7,6 +7,7 @@ import (
 
 func Start(container *dig.Container) {
 	err := container.Invoke(func(app *di.App) {
+		app.Cron.StartCron()
 		app.Client.Run()
 	})
 	if err != nil {

@@ -3,22 +3,7 @@ package tgClient
 import (
 	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
-	"motivation-bot/integrations/forismatic"
 )
-
-func HandleMessage(bot *tgbotapi.BotAPI, update *tgbotapi.Update, client *forismatic.Client) {
-	if len(update.Message.Text) > 256 {
-		handleTooLongMessage(bot, update)
-		return
-	}
-
-	client.GetQuote()
-
-	msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
-
-	bot.Send(msg)
-
-}
 
 func handleTooLongMessage(bot *tgbotapi.BotAPI, update *tgbotapi.Update) {
 	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Message to long. Please write to @lutogin for fix that. 👺")

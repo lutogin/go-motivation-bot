@@ -29,11 +29,11 @@ func NewClient(logger *logging.Logger) *Client {
 	}
 }
 
-func (c *Client) GetQuote(key ...int) GetQuoteResponse {
+func (c *Client) GetQuote(lang string, key ...int) GetQuoteResponse {
 	formData := url.Values{
 		"method": []string{"getQuote"},
 		"format": []string{"json"},
-		"lang":   []string{"ru"},
+		"lang":   []string{lang},
 	}
 
 	if len(key) > 0 {

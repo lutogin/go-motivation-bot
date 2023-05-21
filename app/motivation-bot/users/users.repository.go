@@ -113,13 +113,7 @@ func (r *Repo) GetByFilter(ctx context.Context, payload userDto.GetUsersDto) (fo
 }
 
 func (r *Repo) Update(ctx context.Context, payload userDto.UpdateUserDto) (err error) {
-	oid, err := primitive.ObjectIDFromHex(payload.Id)
-	if err != nil {
-		r.logger.Errorf("Failed to convert ObjectIDFromHex: %v", err)
-		return err
-	}
-
-	filter := bson.M{"_id": oid}
+	filter := bson.M{"userName": payload.UserName}
 	payloadBytes, err := bson.Marshal(payload)
 	if err != nil {
 		r.logger.Errorf("Failed to bson marshal: %v", err)
@@ -133,8 +127,6 @@ func (r *Repo) Update(ctx context.Context, payload userDto.UpdateUserDto) (err e
 		return err
 	}
 
-	delete(updatePayload, "Id") // drop ID from payload to update
-
 	update := bson.M{"$set": updatePayload}
 
 	result, err := r.collection.UpdateOne(ctx, filter, update)
@@ -144,8 +136,7 @@ func (r *Repo) Update(ctx context.Context, payload userDto.UpdateUserDto) (err e
 	}
 
 	if result.MatchedCount == 0 {
-		r.logger.Tracef("not found at update by ID: %s", payload.Id)
-		return errors.New("not found")
+		r.logger.Warnf("not found at update by UserName: %s", payload.UserName)
 	}
 	return nil
 }
@@ -170,4 +161,29 @@ func (r *Repo) Delete(ctx context.Context, payload userDto.DeleteUserDto) (err e
 	}
 
 	return nil
+}
+
+func (r *Repo) GetUsersByAlertingDate(ctx context.Context, payload userDto.GetUserByAlertingDateDto) ([]UserEntity, error) {
+	// Build the query
+	filter := bson.M{
+		"alertingDate": bson.M{
+			"$gte": payload.From,
+			"$lte": payload.To,
+		},
+	}
+
+	cursor, err := r.collection.Find(ctx, filter)
+	if err != nil {
+		r.logger.Errorf("Failed to get users by alerting date: %v", err)
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var users []UserEntity
+	if err = cursor.All(ctx, &users); err != nil {
+		r.logger.Errorf("Failed to load users by alerting date to the entity: %v", err)
+		return nil, err
+	}
+
+	return users, nil
 }

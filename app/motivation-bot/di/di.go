@@ -6,6 +6,7 @@ import (
 	"motivation-bot/adapters/tgClient"
 	"motivation-bot/common"
 	"motivation-bot/config"
+	cronJobs "motivation-bot/cron"
 	"motivation-bot/integrations/forismatic"
 	"motivation-bot/logging"
 	"motivation-bot/users"
@@ -14,16 +15,18 @@ import (
 type App struct {
 	//Config *config.Env
 	//Logger *logging.Logger
-	Client *tgClient.Client
+	Client *tgClient.TgClient
 	//UsersRepo *users.Repo
+	Cron *cronJobs.CronJob
 }
 
-func NewApp(client *tgClient.Client) *App {
+func NewApp(client *tgClient.TgClient, cron *cronJobs.CronJob) *App {
 	return &App{
 		//Config:    config,
 		//Logger:    logger,
 		Client: client,
 		//UsersRepo: repo,
+		Cron: cron,
 	}
 }
 
@@ -32,8 +35,18 @@ func ProvideMongoConnection(container *dig.Container) {
 	common.CriticErrorHandler(err)
 }
 
-func ProvideNewUsersRepository(container *dig.Container) {
+func ProvideUsersRepository(container *dig.Container) {
 	err := container.Provide(users.NewRepository)
+	common.CriticErrorHandler(err)
+}
+
+func ProvideUsersService(container *dig.Container) {
+	err := container.Provide(users.NewService)
+	common.CriticErrorHandler(err)
+}
+
+func ProvideCronJob(container *dig.Container) {
+	err := container.Provide(cronJobs.NewCronJob)
 	common.CriticErrorHandler(err)
 }
 
@@ -61,7 +74,9 @@ func BuildContainer() *dig.Container {
 	common.CriticErrorHandler(err)
 
 	ProvideMongoConnection(container) // todo: split all containers like this.
-	ProvideNewUsersRepository(container)
+	ProvideUsersRepository(container)
+	ProvideUsersService(container)
+	ProvideCronJob(container)
 
 	return container
 }
