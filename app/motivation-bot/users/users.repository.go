@@ -15,10 +15,8 @@ import (
 )
 
 type GetUsersByAlertingTimeDto struct {
-	HoursFrom   int
-	MinutesFrom int
-	HoursTo     int
-	MinutesTo   int
+	TimeFrom int `bson:"timeFrom" json:"timeFrom"` // format 1600 fot 16:00^ or 0 for 00:00, 15 for 00:15
+	TimeTo   int `bson:"timeTo" json:"timeTo"`
 }
 
 type Repository interface {
@@ -202,13 +200,9 @@ func (r *Repo) Delete(ctx context.Context, payload usersDto.DeleteUserDto) error
 func (r *Repo) GetUsersByAlertingTime(ctx context.Context, payload GetUsersByAlertingTimeDto) ([]UserEntity, error) {
 	// Build the query
 	filter := bson.M{
-		"alertingTime.hours": bson.M{
-			"$gte": payload.HoursFrom,
-			"$lte": payload.HoursTo,
-		},
-		"alertingTime.minutes": bson.M{
-			"$gte": payload.MinutesFrom,
-			"$lte": payload.MinutesTo,
+		"alertingTime": bson.M{
+			"$gte": payload.TimeFrom,
+			"$lte": payload.TimeTo,
 		},
 	}
 

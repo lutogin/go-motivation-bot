@@ -2,8 +2,10 @@ package users
 
 import (
 	"context"
+	"fmt"
 	"motivation-bot/logging"
 	"motivation-bot/users/dto"
+	"strconv"
 	"time"
 )
 
@@ -55,18 +57,14 @@ func (s *Service) Delete(ctx context.Context, payload usersDto.DeleteUserDto) er
 func (s *Service) GetByAlertingDate(ctx context.Context, payload usersDto.GetUserByAlertingTimeDto) ([]UserEntity, error) {
 	from := payload.Date.Add(-5 * time.Minute)
 	to := payload.Date.Add(5 * time.Minute)
-	hoursFrom := from.Hour()
-	minutesFrom := from.Minute()
-	hoursTo := to.Hour()
-	minutesTo := to.Minute()
+	timeFrom, _ := strconv.Atoi(fmt.Sprintf("%d%d", from.Hour(), from.Minute()))
+	timeTo, _ := strconv.Atoi(fmt.Sprintf("%d%d", to.Hour(), to.Minute()))
 
 	result, err := s.repo.GetUsersByAlertingTime(
 		ctx,
 		GetUsersByAlertingTimeDto{
-			HoursFrom:   hoursFrom,
-			MinutesFrom: minutesFrom,
-			HoursTo:     hoursTo,
-			MinutesTo:   minutesTo,
+			TimeFrom: timeFrom,
+			TimeTo:   timeTo,
 		},
 	)
 

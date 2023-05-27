@@ -43,7 +43,7 @@ func (t *TgClient) HandleMessage(update *tgbotapi.Update) {
 
 	ctxUpd, cancelUpd := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancelUpd()
-	err = t.userService.Update(ctxUpd, usersDto.UpdateUserDto{UserName: update.Message.From.UserName, AlertingTime: usersDto.AlertingTime{Hours: nowInUserTZ.Hour(), Minutes: nowInUserTZ.Minute()}})
+	err = t.userService.Update(ctxUpd, usersDto.UpdateUserDto{UserName: update.Message.From.UserName, AlertingTime: common.GetTimeFromDate(nowInUserTZ)})
 	if err != nil {
 		t.SendMessage(senderChatId, "Seem like you are not registered. True to user /start command.")
 		return
