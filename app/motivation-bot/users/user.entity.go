@@ -11,4 +11,5 @@ type UserEntity struct {
 	UserName     string                `json:"userName" bson:"userName"`
 	AlertingTime usersDto.AlertingTime `json:"alertingTime" bson:"alertingTime"`
 	Lang         string                `json:"lang" bson:"lang"`
+	TimeZone     int                   `json:"timeZone" bson:"timeZone"`
 }

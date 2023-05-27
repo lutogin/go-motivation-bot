@@ -7,6 +7,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"motivation-bot/adapters/mongoClient"
 	"motivation-bot/logging"
@@ -25,6 +26,7 @@ type Repository interface {
 	GetById(ctx context.Context, payload usersDto.GetUserByIdDto) (user UserEntity, err error)
 	GetByFilter(ctx context.Context, payload usersDto.GetUsersDto) (user []UserEntity, err error)
 	Update(ctx context.Context, payload usersDto.UpdateUserDto) (err error)
+	Upsert(ctx context.Context, payload usersDto.CreateUserDto) (err error)
 	Delete(ctx context.Context, payload usersDto.DeleteUserDto) (err error)
 }
 
@@ -78,6 +80,27 @@ func (r *Repo) GetById(ctx context.Context, payload usersDto.GetUserByIdDto) (Us
 	if err = result.Decode(&user); err != nil {
 		return user, err
 	}
+	return user, nil
+}
+
+func (r *Repo) GetByChatId(ctx context.Context, payload usersDto.GetUserByChatIdDto) (UserEntity, error) {
+	var user UserEntity
+	filter := bson.M{"chatId": payload.ChatId}
+	result := r.collection.FindOne(ctx, filter)
+
+	if err := result.Err(); err != nil {
+		if errors.Is(result.Err(), mongo.ErrNoDocuments) {
+			return user, errors.New("user not found")
+		}
+		r.logger.Errorf("Error during looking for users by chat id: %s \n", payload.ChatId)
+		r.logger.Traceln(payload.ChatId)
+		return user, err
+	}
+
+	if err := result.Decode(&user); err != nil {
+		return user, err
+	}
+
 	return user, nil
 }
 
@@ -205,4 +228,38 @@ func (r *Repo) GetUsersByAlertingTime(ctx context.Context, payload GetUsersByAle
 	}
 
 	return users, nil
+}
+
+func (r *Repo) Upsert(ctx context.Context, payload usersDto.UpdateUserDto) error {
+	// Define the filter for the update operation
+	filter := bson.M{"chatId": payload.ChatId}
+
+	payloadBytes, err := bson.Marshal(payload)
+	if err != nil {
+		r.logger.Errorf("Failed to bson marshal: %v", err)
+		return err
+	}
+
+	var updatePayload bson.M
+	err = bson.Unmarshal(payloadBytes, &updatePayload)
+	if err != nil {
+		r.logger.Errorf("Failed to bson marshal: %v", err)
+		return err
+	}
+
+	// Define the update to be performed if a document matching the filter is found
+	update := bson.M{
+		"$set": updatePayload,
+	}
+
+	// Define options to indicate that upsert should be used
+	opts := options.Update().SetUpsert(true)
+
+	// Perform the update operation
+	_, err = r.collection.UpdateOne(ctx, filter, update, opts)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

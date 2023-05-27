@@ -37,7 +37,7 @@ func NewCronJob(logger *logging.Logger, tgClient *tgClient.TgClient, usersServic
 }
 
 func (c *CronJob) StartCron() {
-	interval := fmt.Sprintf("@every %dm", c.cfg.CronInterval)
+	interval := fmt.Sprintf("*/%d * * * *", c.cfg.CronInterval)
 	_, err := c.cron.AddFunc(interval, func() {
 		ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 		defer cancel()

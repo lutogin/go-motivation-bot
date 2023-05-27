@@ -2,25 +2,28 @@ package tgClient
 
 import (
 	"context"
+	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"motivation-bot/users/dto"
+	"strconv"
 	"strings"
 	"time"
 )
 
-type availableQueries struct {
+type AvailableQueries struct {
 	SetLang string `mapstructure:"setLang"`
+	SetGMT  string `mapstructure:"setGMT"`
 }
 
-func newAvailableQueries() availableQueries {
-	return availableQueries{SetLang: "setLang"}
+func newAvailableQueries() AvailableQueries {
+	return AvailableQueries{SetLang: "setLang", SetGMT: "setGMT"}
 }
 
 func saveLangForUser(t *TgClient, update *tgbotapi.Update, lang string) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	t.userService.Create(ctx, usersDto.CreateUserDto{
+	t.userService.Upsert(ctx, usersDto.UpdateUserDto{
 		ChatId:    update.CallbackQuery.From.ID,
 		FirstName: update.CallbackQuery.From.FirstName,
 		LastName:  update.CallbackQuery.From.LastName,
@@ -29,42 +32,56 @@ func saveLangForUser(t *TgClient, update *tgbotapi.Update, lang string) {
 	})
 }
 
-func setLangHandler(t *TgClient, bot *tgbotapi.BotAPI, update *tgbotapi.Update, options string) {
-	switch options {
-	case "en":
-		saveLangForUser(t, update, "en")
+func setGMT(t *TgClient, update *tgbotapi.Update, options string) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
-		msg := tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, "Now, please send a time when you want to receive quotes. It should be 24h format time the next format '18:30'. Minutes must be a multiple of 30")
-		_, err := bot.Send(msg)
-		if err != nil {
-			t.logger.Error(err)
-		}
+	gmtInt, _ := strconv.Atoi(options)
 
-		msg = tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, "Bot is in test mode, so sending will be at the specified time but in UTC-0, please consider the offset in your timezone.")
-		_, err = bot.Send(msg)
-		if err != nil {
-			t.logger.Error(err)
-		}
+	t.userService.Upsert(ctx, usersDto.UpdateUserDto{
+		ChatId:    update.CallbackQuery.From.ID,
+		FirstName: update.CallbackQuery.From.FirstName,
+		LastName:  update.CallbackQuery.From.LastName,
+		UserName:  update.CallbackQuery.From.UserName,
+		TimeZone:  gmtInt,
+	})
 
-	case "ru":
-		saveLangForUser(t, update, "ru")
-
-		msg := tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, "Теперь, пожалуйста, укажите время, когда вы хотите получать цитаты. Это должно быть время в формате 24 часа, следующий формат '18:30' Минуты долджны быть кратные 30.")
-		_, err := bot.Send(msg)
-		if err != nil {
-			t.logger.Error(err)
-		}
-
-		msg = tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, "Бот находится в тестовом режиме, поэтому отправка будет в указанное время, но по UTC-0, пожалуйста, учитывайте смещение по вашей таймзоне.")
-		_, err = bot.Send(msg)
-		if err != nil {
-			t.logger.Error(err)
-		}
-
-	}
+	t.SendMessage(update.CallbackQuery.Message.Chat.ID, "Now, please send a time when you want to receive quotes. It should be 24h time in the next format '18:30'. Minutes must be a multiple of 30")
 }
 
-func (t *TgClient) HandleQuery(bot *tgbotapi.BotAPI, update *tgbotapi.Update) {
+func sendMsgGMTElection(bot *tgbotapi.BotAPI, chatId int64) {
+	var timezones = []string{"GMT-12", "GMT-11", "GMT-10", "GMT-9", "GMT-8",
+		"GMT-7", "GMT-6", "GMT-5", "GMT-4", "GMT-3", "GMT-2", "GMT-1", "GMT-0",
+		"GMT+1", "GMT+2", "GMT+3", "GMT+4", "GMT+5", "GMT+6", "GMT+7", "GMT+8",
+		"GMT+9", "GMT+10", "GMT+11", "GMT+12"}
+
+	msg := tgbotapi.NewMessage(chatId, "Please choose your timezone:")
+
+	var row []tgbotapi.InlineKeyboardButton
+	var keyboard [][]tgbotapi.InlineKeyboardButton
+
+	for _, tz := range timezones {
+		row = append(row, tgbotapi.NewInlineKeyboardButtonData(tz, fmt.Sprintf("setGMT:%s", strings.Replace(tz, "GMT", "", 1))))
+		if len(row) == 3 {
+			keyboard = append(keyboard, row)
+			row = nil
+		}
+	}
+	if len(row) > 0 {
+		keyboard = append(keyboard, row)
+	}
+
+	msg.ReplyMarkup = tgbotapi.NewInlineKeyboardMarkup(keyboard...)
+
+	bot.Send(msg)
+}
+
+func setLangHandler(t *TgClient, update *tgbotapi.Update, options string) {
+	saveLangForUser(t, update, options)
+	sendMsgGMTElection(t.client, update.CallbackQuery.Message.Chat.ID)
+}
+
+func (t *TgClient) HandleQuery(update *tgbotapi.Update) {
 	queryArr := strings.Split(update.CallbackQuery.Data, ":")
 	query := queryArr[0]
 	option := queryArr[1]
@@ -78,7 +95,9 @@ func (t *TgClient) HandleQuery(bot *tgbotapi.BotAPI, update *tgbotapi.Update) {
 
 	switch query {
 	case availableQuery.SetLang:
-		setLangHandler(t, bot, update, option)
+		setLangHandler(t, update, option)
+	case availableQuery.SetGMT:
+		setGMT(t, update, option)
 	default:
 		t.SendMessage(update.Message.Chat.ID, "Command not found.")
 	}

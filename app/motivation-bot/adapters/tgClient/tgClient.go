@@ -10,7 +10,7 @@ func (t *TgClient) SendMessage(chatId int64, message string) {
 	msg := tgbotapi.NewMessage(chatId, message)
 	_, err := t.client.Send(msg)
 	if err != nil {
-		t.logger.Traceln(fmt.Sprintf("Error on sending message to %d", chatId))
+		t.logger.Traceln(fmt.Sprintf("Error on sending message to %d, msg: %s", chatId, message))
 		t.logger.Error(err)
 	}
 }

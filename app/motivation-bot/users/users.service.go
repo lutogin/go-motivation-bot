@@ -19,15 +19,17 @@ func NewService(repository *Repo, logger *logging.Logger) *Service {
 
 func (s *Service) Create(ctx context.Context, payload usersDto.CreateUserDto) (string, error) {
 	result, err := s.repo.Create(ctx, payload)
+
 	return result, err
 }
 
 func (s *Service) GetById(ctx context.Context, payload usersDto.GetUserByIdDto) (UserEntity, error) {
 	result, err := s.repo.GetById(ctx, payload)
+
 	return result, err
 }
 
-func (s *Service) GetAll(ctx context.Context, payload usersDto.GetUsersDto) ([]UserEntity, error) {
+func (s *Service) GetByFilter(ctx context.Context, payload usersDto.GetUsersDto) ([]UserEntity, error) {
 	result, err := s.repo.GetByFilter(ctx, payload)
 	return result, err
 }
@@ -46,6 +48,7 @@ func (s *Service) Delete(ctx context.Context, payload usersDto.DeleteUserDto) er
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -68,4 +71,19 @@ func (s *Service) GetByAlertingDate(ctx context.Context, payload usersDto.GetUse
 	)
 
 	return result, err
+}
+
+func (s *Service) Upsert(ctx context.Context, payload usersDto.UpdateUserDto) error {
+	err := s.repo.Upsert(ctx, payload)
+
+	return err
+}
+
+func (s *Service) GetByChatId(ctx context.Context, payload usersDto.GetUserByChatIdDto) (UserEntity, error) {
+	user, err := s.repo.GetByChatId(ctx, payload)
+	if err != nil {
+		return UserEntity{}, err
+	}
+
+	return user, nil
 }

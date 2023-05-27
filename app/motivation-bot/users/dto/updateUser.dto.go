@@ -7,4 +7,5 @@ type UpdateUserDto struct {
 	UserName     string       `json:"userName,omitempty" bson:"userName,omitempty"`
 	AlertingTime AlertingTime `json:"alertingTime,omitempty" bson:"alertingTime,omitempty"`
 	Lang         string       `json:"lang,omitempty" bson:"lang,omitempty"`
+	TimeZone     int          `json:"timeZone,omitempty" bson:"timeZone,omitempty"`
 }

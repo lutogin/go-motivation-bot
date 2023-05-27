@@ -49,15 +49,15 @@ func (t *TgClient) Run() {
 	for update := range updates {
 		if update.Message != nil {
 			if update.Message.IsCommand() {
-				t.HandleCommand(t.client, &update)
+				t.HandleCommand(&update)
 				continue
 			} else {
-				t.HandleMessage(t.client, &update, t.forismatic)
+				t.HandleMessage(&update)
 			}
 			continue
 		} else if update.CallbackQuery != nil {
 			// this is where we handle the callback query
-			t.HandleQuery(t.client, &update)
+			t.HandleQuery(&update)
 			continue
 		}
 
