@@ -6,6 +6,7 @@ import (
 	"github.com/robfig/cron/v3"
 	"motivation-bot/adapters/tgClient"
 	"motivation-bot/config"
+	"motivation-bot/integrations/forismatic"
 	"motivation-bot/logging"
 	"motivation-bot/users"
 	usersDto "motivation-bot/users/dto"
@@ -13,23 +14,25 @@ import (
 )
 
 type CronJob struct {
-	cron         *cron.Cron
-	logger       *logging.Logger
-	tgClient     *tgClient.TgClient
-	usersService *users.Service
-	cfg          *config.Env
+	cron             *cron.Cron
+	logger           *logging.Logger
+	tgClient         *tgClient.TgClient
+	usersService     *users.Service
+	forismaticClient *forismatic.Client
+	cfg              *config.Env
 }
 
-func NewCronJob(logger *logging.Logger, tgClient *tgClient.TgClient, usersService *users.Service, cfg *config.Env) *CronJob {
+func NewCronJob(logger *logging.Logger, tgClient *tgClient.TgClient, usersService *users.Service, forismaticClient *forismatic.Client, cfg *config.Env) *CronJob {
 	logger.Info("Registering cron job.")
 
 	c := cron.New()
 	return &CronJob{
-		cron:         c,
-		logger:       logger,
-		tgClient:     tgClient,
-		usersService: usersService,
-		cfg:          cfg,
+		cron:             c,
+		logger:           logger,
+		tgClient:         tgClient,
+		usersService:     usersService,
+		forismaticClient: forismaticClient,
+		cfg:              cfg,
 	}
 }
 
@@ -40,14 +43,24 @@ func (c *CronJob) StartCron() {
 		defer cancel()
 
 		c.logger.Infoln("Running job", time.Now())
-		from := time.Now().Add(-5 * time.Minute)
-		to := time.Now().Add(5 * time.Minute)
-		users, _ := c.usersService.GetByAlertingDate(ctx, usersDto.GetUserByAlertingDateDto{From: from, To: to})
+		users, _ := c.usersService.GetByAlertingDate(ctx, usersDto.GetUserByAlertingTimeDto{Date: time.Now()})
+
+		if len(users) == 0 {
+			return
+		}
+
+		quotes := map[string]forismatic.GetQuoteResponse{
+			"ru": c.forismaticClient.GetQuote("ru"),
+			"en": c.forismaticClient.GetQuote("en"),
+		}
 
 		for _, u := range users {
 			c.logger.Infoln(u)
+
+			c.tgClient.SendQuote(u.ChatId, quotes[u.Lang])
 		}
 	})
+
 	if err != nil {
 		c.logger.Error("Cron job is not set.")
 		return

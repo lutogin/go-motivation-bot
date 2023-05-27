@@ -1,29 +1,54 @@
 package tgClient
 
 import (
+	"context"
 	"fmt"
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"motivation-bot/common"
+	"motivation-bot/integrations/forismatic"
+	"motivation-bot/users/dto"
+	"strconv"
+	"strings"
+	"time"
 )
 
-func handleTooLongMessage(bot *tgbotapi.BotAPI, update *tgbotapi.Update) {
-	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Message to long. Please write to @lutogin for fix that. 👺")
-	bot.Send(msg)
-}
+func (t *TgClient) HandleMessage(bot *tgbotapi.BotAPI, update *tgbotapi.Update, client *forismatic.Client) {
+	incomeMsg := update.Message.Text
+	senderChatId := update.Message.Chat.ID
 
-func handleCommands(bot *tgbotapi.BotAPI, update *tgbotapi.Update) {
-	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
+	if !common.Is24TimeFormat(update.Message.Text) {
+		msg := tgbotapi.NewMessage(senderChatId, "Wrong format. \nExample: '12:30', '13:00', '00:30'")
+		_, err := bot.Send(msg)
+		if err != nil {
+			t.logger.Error(err)
+		}
 
-	switch update.Message.Command() {
-	case "start":
-		msg.Text = "👋 Welcome! To receive messages with a customized font, just send me the text you want to customizing. Supports only LATIN symbols 🇺🇸.\n🇺🇦Glory to Ukraine!"
-	case "help":
-		msg.Text = "I am a simple bot for customization text. Just try to send me any message. Supports only LATIN symbols 🇺🇸."
-	default:
-		msg.Text = "👨‍💻 I don't know that command. Just write me a message containing what you do want to transform."
+		return
 	}
 
-	_, err := bot.Send(msg)
+	incomeDateArr := strings.Split(incomeMsg, ":")
+	hours, _ := strconv.Atoi(incomeDateArr[0])
+	minutes, _ := strconv.Atoi(incomeDateArr[1])
+
+	now := time.Now()
+	setTime := time.Date(now.Year(), now.Month(), now.Day(), hours, minutes, 0, 0, now.Location())
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	err := t.userService.Update(ctx, usersDto.UpdateUserDto{UserName: update.Message.From.UserName, AlertingTime: usersDto.AlertingTime{Hours: hours, Minutes: minutes}})
 	if err != nil {
-		fmt.Println(err.Error())
+		t.SendMessage(senderChatId, "Seem like you are not registered. True to user /start command.")
+		return
+	}
+
+	if time.Now().After(setTime) {
+		t.SendMessage(senderChatId, "Bot set this time for you.")
+		t.SendMessage(senderChatId, "There is one quote for you for today:")
+
+		quote := client.GetQuote("ru")
+		t.SendQuote(senderChatId, quote)
+	} else {
+		t.SendMessage(senderChatId, "Bot set this time for you.")
+		t.SendMessage(senderChatId, fmt.Sprintf("You will receive a quote later today, at %s.", incomeMsg))
 	}
 }

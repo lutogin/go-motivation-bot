@@ -3,21 +3,29 @@ package users
 import (
 	"context"
 	"errors"
+	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
 	"motivation-bot/adapters/mongoClient"
 	"motivation-bot/logging"
-	userDto "motivation-bot/users/dto"
+	"motivation-bot/users/dto"
 )
 
+type GetUsersByAlertingTimeDto struct {
+	HoursFrom   int
+	MinutesFrom int
+	HoursTo     int
+	MinutesTo   int
+}
+
 type Repository interface {
-	Create(ctx context.Context, payload userDto.CreateUserDto) (id string, err error)
-	GetById(ctx context.Context, payload userDto.GetUserByIdDto) (user UserEntity, err error)
-	GetByFilter(ctx context.Context, payload userDto.GetUsersDto) (user []UserEntity, err error)
-	Update(ctx context.Context, payload userDto.UpdateUserDto) (err error)
-	Delete(ctx context.Context, payload userDto.DeleteUserDto) (err error)
+	Create(ctx context.Context, payload usersDto.CreateUserDto) (id string, err error)
+	GetById(ctx context.Context, payload usersDto.GetUserByIdDto) (user UserEntity, err error)
+	GetByFilter(ctx context.Context, payload usersDto.GetUsersDto) (user []UserEntity, err error)
+	Update(ctx context.Context, payload usersDto.UpdateUserDto) (err error)
+	Delete(ctx context.Context, payload usersDto.DeleteUserDto) (err error)
 }
 
 type Repo struct {
@@ -34,22 +42,25 @@ func NewRepository(mongoConn *mongoClient.MongoConnection, logger *logging.Logge
 	}
 }
 
-func (r *Repo) Create(ctx context.Context, payload userDto.CreateUserDto) (id string, err error) {
+func (r *Repo) Create(ctx context.Context, payload usersDto.CreateUserDto) (string, error) {
 	result, err := r.collection.InsertOne(ctx, payload)
 	if err != nil {
 		return "", err
 	}
+
 	oid, ok := result.InsertedID.(primitive.ObjectID)
 	if !ok {
-		errMsg := "error during getti ng oid"
+		errMsg := "error during getting oid"
 		r.logger.Errorln(errMsg)
 		r.logger.Traceln(payload)
 		return "", errors.New(errMsg)
 	}
+
 	return oid.Hex(), nil
 }
 
-func (r *Repo) GetById(ctx context.Context, payload userDto.GetUserByIdDto) (user UserEntity, err error) {
+func (r *Repo) GetById(ctx context.Context, payload usersDto.GetUserByIdDto) (UserEntity, error) {
+	var user UserEntity
 	oid, err := primitive.ObjectIDFromHex(payload.Id)
 	if err != nil {
 		return user, err
@@ -70,11 +81,12 @@ func (r *Repo) GetById(ctx context.Context, payload userDto.GetUserByIdDto) (use
 	return user, nil
 }
 
-func (r *Repo) GetByFilter(ctx context.Context, payload userDto.GetUsersDto) (foundUsers []UserEntity, err error) {
+func (r *Repo) GetByFilter(ctx context.Context, payload usersDto.GetUsersDto) ([]UserEntity, error) {
+	var foundUsers []UserEntity
 	// Marshal the anonymous struct into BSON bytes
 	bsonBytes, err := bson.Marshal(payload)
 	if err != nil {
-		log.Fatal("Error marshaling userDto.GetUsersDto struct:", err)
+		log.Fatal("Error marshaling usersDto.GetUsersDto struct:", err)
 	}
 
 	// Unmarshal the BSON bytes into a bson.M
@@ -112,7 +124,7 @@ func (r *Repo) GetByFilter(ctx context.Context, payload userDto.GetUsersDto) (fo
 	return foundUsers, nil
 }
 
-func (r *Repo) Update(ctx context.Context, payload userDto.UpdateUserDto) (err error) {
+func (r *Repo) Update(ctx context.Context, payload usersDto.UpdateUserDto) error {
 	filter := bson.M{"userName": payload.UserName}
 	payloadBytes, err := bson.Marshal(payload)
 	if err != nil {
@@ -137,11 +149,12 @@ func (r *Repo) Update(ctx context.Context, payload userDto.UpdateUserDto) (err e
 
 	if result.MatchedCount == 0 {
 		r.logger.Warnf("not found at update by UserName: %s", payload.UserName)
+		return errors.New("not found user for update alerting time")
 	}
 	return nil
 }
 
-func (r *Repo) Delete(ctx context.Context, payload userDto.DeleteUserDto) (err error) {
+func (r *Repo) Delete(ctx context.Context, payload usersDto.DeleteUserDto) error {
 	uid, err := primitive.ObjectIDFromHex(payload.Id)
 	if err != nil {
 		r.logger.Errorf("Failed to ObjectIDFromHex for ID: %s", payload.Id)
@@ -163,14 +176,20 @@ func (r *Repo) Delete(ctx context.Context, payload userDto.DeleteUserDto) (err e
 	return nil
 }
 
-func (r *Repo) GetUsersByAlertingDate(ctx context.Context, payload userDto.GetUserByAlertingDateDto) ([]UserEntity, error) {
+func (r *Repo) GetUsersByAlertingTime(ctx context.Context, payload GetUsersByAlertingTimeDto) ([]UserEntity, error) {
 	// Build the query
 	filter := bson.M{
-		"alertingDate": bson.M{
-			"$gte": payload.From,
-			"$lte": payload.To,
+		"alertingTime.hours": bson.M{
+			"$gte": payload.HoursFrom,
+			"$lte": payload.HoursTo,
+		},
+		"alertingTime.minutes": bson.M{
+			"$gte": payload.MinutesFrom,
+			"$lte": payload.MinutesTo,
 		},
 	}
+
+	fmt.Println(payload)
 
 	cursor, err := r.collection.Find(ctx, filter)
 	if err != nil {
