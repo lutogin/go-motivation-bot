@@ -21,6 +21,6 @@ func Is24TimeFormat(inpTime string) bool {
 }
 
 func GetTimeFromDate(date time.Time) int {
-	d, _ := strconv.Atoi(fmt.Sprintf("%d%d", date.Hour(), date.Minute()))
+	d, _ := strconv.Atoi(fmt.Sprintf("%d%02d", date.Hour(), date.Minute()))
 	return d
 }

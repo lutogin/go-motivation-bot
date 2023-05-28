@@ -26,7 +26,7 @@ services:
     ports:
       - '27017:27017'
     environment:
-      MONGO_INITDB_DATABASE: go-motivation-bot-users
+      MONGO_INITDB_DATABASE: go-motivation-bot-db
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: Password1
       MONGO_USERNAME: user

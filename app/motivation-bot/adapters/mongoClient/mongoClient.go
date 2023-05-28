@@ -16,10 +16,12 @@ type MongoConnection struct {
 	DB *mongo.Database
 }
 
+const CollectionName = "users"
+
 // todo I don't like it. Like a break SOLID. need to rewrite
 func makeIndexes(db *mongo.Database) {
 	// Get the collection
-	collection := db.Collection("users")
+	collection := db.Collection(CollectionName)
 
 	// Create a model for the unique index
 	indexModel := mongo.IndexModel{

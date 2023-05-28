@@ -38,7 +38,7 @@ func setGMT(t *TgClient, update *tgbotapi.Update, options string) {
 
 	gmtInt, _ := strconv.Atoi(options)
 
-	t.userService.Upsert(ctx, usersDto.UpdateUserDto{
+	t.userService.Update(ctx, usersDto.UpdateUserDto{
 		ChatId:    update.CallbackQuery.From.ID,
 		FirstName: update.CallbackQuery.From.FirstName,
 		LastName:  update.CallbackQuery.From.LastName,
@@ -46,7 +46,7 @@ func setGMT(t *TgClient, update *tgbotapi.Update, options string) {
 		TimeZone:  gmtInt,
 	})
 
-	t.SendMessage(update.CallbackQuery.Message.Chat.ID, "Now, please send a time when you want to receive quotes. It should be 24h time in the next format '18:30'. Minutes must be a multiple of 30")
+	t.SendMessage(update.CallbackQuery.Message.Chat.ID, "Now, please send a time when you want to receive quotes. \nIt should be 24h time in the next format '18:30'.\nMinutes must be a multiple of 30")
 }
 
 func sendMsgGMTElection(bot *tgbotapi.BotAPI, chatId int64) {
