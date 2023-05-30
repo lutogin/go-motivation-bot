@@ -48,6 +48,10 @@ func (t *TgClient) Run() {
 
 	for update := range updates {
 		if update.Message != nil {
+			if update.Message.From.IsBot {
+				continue
+			}
+
 			if update.Message.IsCommand() {
 				t.HandleCommand(&update)
 				continue
@@ -56,6 +60,10 @@ func (t *TgClient) Run() {
 			}
 			continue
 		} else if update.CallbackQuery != nil {
+			if update.CallbackQuery.From.IsBot {
+				continue
+			}
+
 			// this is where we handle the callback query
 			t.HandleQuery(&update)
 			continue

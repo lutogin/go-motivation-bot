@@ -46,7 +46,7 @@ func setGMT(t *TgClient, update *tgbotapi.Update, options string) {
 		TimeZone:  gmtInt,
 	})
 
-	t.SendMessage(update.CallbackQuery.Message.Chat.ID, "Now, please send a time when you want to receive quotes. \nIt should be 24h time in the next format '18:30'.\nMinutes must be a multiple of 30")
+	t.SendMessage(update.CallbackQuery.Message.Chat.ID, "Please, send a time when you want to receive quotes. \nIt should be in 24h format, as example '18:30'.\nMinutes must be a multiple of 30 (16:30, 17:00, 17:30 etc.)")
 }
 
 func sendMsgGMTElection(bot *tgbotapi.BotAPI, chatId int64) {
