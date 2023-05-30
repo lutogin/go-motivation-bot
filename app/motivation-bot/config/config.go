@@ -9,6 +9,7 @@ import (
 
 type Env struct {
 	IsDebug        bool   `yaml:"isDebug" env:"IS_DEBUG" env-default:"true"`
+	Env            string `yaml:"env" env:"ENV" env-default:"loc"`
 	Host           string `yaml:"host" env:"HOST" env-default:"127.0.0.1"`
 	Port           string `yaml:"port" env:"PORT" env-default:"8080"`
 	TgApiKey       string `yaml:"tgApiKey" env:"TG_API_KEY"`

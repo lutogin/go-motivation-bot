@@ -43,12 +43,11 @@ func NewMongoConnection(config *config.Env, logger *logging.Logger) *MongoConnec
 	logger.Logger.Infoln("Registering mongo connection.")
 
 	suffix := "retryWrites=true&w=majority"
-	connectionString := fmt.Sprintf("%s://%s:%s@%s:%s/%s?%s",
+	connectionString := fmt.Sprintf("%s://%s:%s@%s/%s?%s",
 		config.MongoUriScheme,
 		config.MongoUser,
 		config.MongoPassword,
 		config.MongoHost,
-		config.MongoPort,
 		config.MongoDatabase,
 		suffix,
 	)
