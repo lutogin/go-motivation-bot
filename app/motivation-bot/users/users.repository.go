@@ -197,6 +197,40 @@ func (r *Repo) Delete(ctx context.Context, payload usersDto.DeleteUserDto) error
 	return nil
 }
 
+func (r *Repo) DeleteByUserName(ctx context.Context, payload usersDto.DeleteUserByUserNameDto) error {
+	filter := bson.M{"userName": payload.UserName}
+
+	result, err := r.collection.DeleteOne(ctx, filter)
+	if err != nil {
+		r.logger.Tracef("Username: %s", payload.UserName)
+		r.logger.Errorf("Failed to delete users: %v", err)
+		return err
+	}
+
+	if result.DeletedCount == 0 {
+		r.logger.Errorf("Not found users with username: %s", payload.UserName)
+	}
+
+	return nil
+}
+
+func (r *Repo) DeleteByChatId(ctx context.Context, payload usersDto.DeleteUserByChatIdDto) error {
+	filter := bson.M{"chatId": payload.ChatId}
+
+	result, err := r.collection.DeleteOne(ctx, filter)
+	if err != nil {
+		r.logger.Tracef("ChatId: %s", payload.ChatId)
+		r.logger.Errorf("Failed to delete users: %v", err)
+		return err
+	}
+
+	if result.DeletedCount == 0 {
+		r.logger.Errorf("Not found users with ChatId: %s", payload.ChatId)
+	}
+
+	return nil
+}
+
 func (r *Repo) GetUsersByAlertingTime(ctx context.Context, payload GetUsersByAlertingTimeDto) ([]UserEntity, error) {
 	// Build the query
 	filter := bson.M{

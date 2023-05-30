@@ -54,6 +54,24 @@ func (s *Service) Delete(ctx context.Context, payload usersDto.DeleteUserDto) er
 	return nil
 }
 
+func (s *Service) DeleteByUserName(ctx context.Context, payload usersDto.DeleteUserByUserNameDto) error {
+	err := s.repo.DeleteByUserName(ctx, payload)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *Service) DeleteByChatId(ctx context.Context, payload usersDto.DeleteUserByChatIdDto) error {
+	err := s.repo.DeleteByChatId(ctx, payload)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (s *Service) GetByAlertingDate(ctx context.Context, payload usersDto.GetUserByAlertingTimeDto) ([]UserEntity, error) {
 	from := payload.Date.Add(-5 * time.Minute)
 	to := payload.Date.Add(5 * time.Minute)
