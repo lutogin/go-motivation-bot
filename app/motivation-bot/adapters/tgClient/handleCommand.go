@@ -24,7 +24,7 @@ func handleStartCommand(bot *tgbotapi.BotAPI, update *tgbotapi.Update) {
 	bot.Send(msg)
 }
 
-func handleDeleteSubscriptionCommand(t *TgClient, update *tgbotapi.Update) {
+func handleStopCommand(t *TgClient, update *tgbotapi.Update) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -42,8 +42,8 @@ func (t *TgClient) HandleCommand(update *tgbotapi.Update) {
 	case "setup":
 		handleStartCommand(t.client, update)
 		break
-	case "remove":
-		handleDeleteSubscriptionCommand(t, update)
+	case "stop":
+		handleStopCommand(t, update)
 		break
 	default:
 		t.SendMessage(update.Message.Chat.ID, "I don't know that command.")
