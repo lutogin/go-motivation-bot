@@ -1,0 +1,50 @@
+[
+  {
+    "id": "Please, choose a language of quotes:",
+    "translation": "Please, choose a language of quotes:"
+  },
+  {
+    "id": "You've been unsubscribed from the notifications. \nHave a nice day!",
+    "translation": "You've been unsubscribed from the notifications. \nHave a nice day!"
+  },
+  {
+    "id": "I don't know that command.",
+    "translation": "I don't know that command."
+  },
+  {
+    "id": "Please, send a time when you want to receive quotes. \nIt should be in 24h format, as example '18:30'.\nMinutes must be a multiple of 30 or 00 (16:30, 17:00, 17:30 etc.)",
+    "translation": "Please, send a time when you want to receive quotes. \nIt should be in 24h format, as example '18:30'.\nMinutes must be a multiple of 30 or 00 (16:30, 17:00, 17:30 etc.)"
+  },
+  {
+    "id": "Please choose your timezone:",
+    "translation": "Please choose your timezone:"
+  },
+  {
+    "id": "Wrong format. \nExample: '12:30', '13:00', '00:30'",
+    "translation": "Wrong format. \nExample: '12:30', '13:00', '00:30'"
+  },
+  {
+    "id": "Seem like you are not registered. Try to use /start command.",
+    "translation": "Seem like you are not registered. Try to use /start command."
+  },
+  {
+    "id": "Bot set this time for you.",
+    "translation": "Bot set this time for you."
+  },
+  {
+    "id": "There is one quote for you for today:",
+    "translation": "There is one quote for you for today:"
+  },
+  {
+    "id": "Bot set this time for you.",
+    "translation": "Bot set this time for you."
+  },
+  {
+    "id": "You will receive a quote later today, at ",
+    "translation": "You will receive a quote later today, at "
+  },
+  {
+    "id": "It's a simple bot for keep you more motivated. \nGlory to Ukraine!!!",
+    "translation": "It's a simple bot for keep you more motivated. \nGlory to Ukraine!!!"
+  }
+]

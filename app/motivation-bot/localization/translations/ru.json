@@ -1,0 +1,46 @@
+[
+  {
+    "id": "Please, choose a language of quotes:",
+    "translation": "Пожалуйста выберите язык на котором хотите получать цитаты:"
+  },
+  {
+    "id": "You've been unsubscribed from the notifications. \nHave a nice day!",
+    "translation": "Вы отписались от получения новых цитат. \nХорошего дня!"
+  },
+  {
+    "id": "I don't know that command.",
+    "translation": "Я не знаю эту команду"
+  },
+  {
+    "id": "Please, send a time when you want to receive quotes. \nIt should be in 24h format, as example '18:30'.\nMinutes must be a multiple of 30 or 00 (16:30, 17:00, 17:30 etc.)",
+    "translation": "Пожалуйста, введите время в которые вы хотите получать цитаты. \nОно должно быть в 24-часовом формате, например '18:30'. \nМинуты должны быть кратны 30 или 00 (16:30, 17:00, 17:30 и т.д.)"
+  },
+  {
+    "id": "Please choose your timezone:",
+    "translation": "Пожалуйста, выберите вашу таймзону:"
+  },
+  {
+    "id": "Wrong format. \nExample: '12:30', '13:00', '00:30'",
+    "translation": "Неверный формат. \nПример: '12:30', '13:00', '00:30'"
+  },
+  {
+    "id": "Seem like you are not registered. Try to use /start command.",
+    "translation": "Похоже вы не зарегестрированы. Попробуйте использовать комманду /start"
+  },
+  {
+    "id": "Bot set this time for you.",
+    "translation": "Бот установил это время для вас."
+  },
+  {
+    "id": "There is one quote for you for today:",
+    "translation": "Вот цитата для сегодня:"
+  },
+  {
+    "id": "You will receive a quote later today, at ",
+    "translation": "Вы получите сегодняшнюю цитату в "
+  },
+  {
+    "id": "It's a simple bot for keep you more motivated. \nGlory to Ukraine!!!",
+    "translation": "Это простой бот для повышения вашей мотивации. \nСлава Украине!!!"
+  }
+]
